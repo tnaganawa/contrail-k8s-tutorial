@@ -1,0 +1,219 @@
+## Last changed: 2017-10-31 15:01:04 UTC
+version 17.2R1.13;
+groups {
+    global {
+        system {
+            host-name ip-172-31-13-230;
+            login {
+                user jnpr {
+                    uid 2000;
+                    class super-user;
+                    authentication {
+                        ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/RPJwrQTR3APRmuIkL4u0W/Kd1F2Da1SgUuiYLwt3OvJGJ030MRUSodL/Aw2RcWlwkjNMEaQp0qF6FPe+OnDm/iqj7xSW/1vJNA82Fjt3l+H0z9sgPAGpx8Q+JDqB31Uw7DG+CMpuyVSbJjj48PhLSJ3fCJZToiVFrnG8m6QfLgV+jprzrt0ULT03Rl+MtcCJO2YHx2fKgonz+F25xOU8ZH7HOQYhGQrmuC3A55U3E1BWZHMGnFztnzjj9p3laSDVdU1gLY7Nyib0nTYCTa+gqzOv1jxpdsXqK5aNhDqblm4n0GRb0pGdcE6YdUwWBM02f357BLT3vcZOfyfFl7T5 awsfedora-amd1"; ## SECRET-DATA
+                    }
+                }
+            }
+            services {
+                ssh {
+                    root-login deny-password;
+                }
+            }
+            syslog {
+                user * {
+                    any emergency;
+                }
+                file messages {
+                    any notice;
+                    authorization info;
+                }
+                file interactive-commands {
+                    interactive-commands any;
+                }
+            }
+        }
+        interfaces {
+            inactive: fxp0 {
+                unit 0 {
+                    family inet {
+                        address 172.31.13.230/20;
+                    }
+                }
+            }
+        }
+        routing-options {
+            static {
+                route 0.0.0.0/0 {
+                    next-hop 172.31.0.1;
+                    inactive: retain;
+                    inactive: no-readvertise;
+                }
+            }
+        }
+    }
+    /* Contrail Generated Group Config */
+    __contrail__ {
+        routing-options {
+            /* Global Routing Options */
+            router-id 172.31.10.57;
+            route-distinguisher-id 172.31.10.57;
+            autonomous-system 64512;
+            dynamic-tunnels {
+                _contrail_asn-64512 {
+                    source-address 172.31.10.57;
+                    gre;
+                    destination-networks {
+                        /* IP Fabric Subnet */
+                        172.31.10.155/32;
+                        /* BGP Router : vmx1 */
+                        172.31.10.57/32;
+                        /* BGP Router : ip-172-31-4-76 */
+                        172.31.4.76/32;
+                    }
+                }
+            }
+        }
+        protocols {
+            /* Protocols Configuration */
+            bgp {
+                /* BGP Router: vmx1, UUID: 77f55fdb-3c47-49bf-97fd-469372dc8303 */
+                group _contrail_asn-64512 {
+                    type internal;
+                    local-address 172.31.10.57;
+                    hold-time 90;
+                    family inet-vpn {
+                        unicast;
+                    }
+                    family inet6-vpn {
+                        unicast;
+                    }
+                    family evpn {
+                        signaling;
+                    }
+                    family route-target;
+                    export _contrail_ibgp_export_policy;
+                    /* BGP Router: ip-172-31-4-76, UUID: 57cb6f05-bae8-40d3-a2af-1ae65b5f21a3 */
+                    neighbor 172.31.4.76 {
+                        peer-as 64512;
+                    }
+                }
+            }
+        }
+        policy-options {
+            /* iBGP Export Policy */
+            policy-statement _contrail_ibgp_export_policy {
+                term inet-vpn {
+                    from family inet-vpn;
+                    then {
+                        next-hop self;
+                    }
+                }
+                term inet6-vpn {
+                    from family inet6-vpn;
+                    then {
+                        next-hop self;
+                    }
+                }
+            }
+        }
+    }
+}
+apply-groups [ global __contrail__ ];
+system {
+    root-authentication {
+        encrypted-password "$6$XWS2qJAr$DJRuJKEOF9pFjPYz1KRSyLfMBGmSNziY301z9B2NC7RZn18GaF8YGO38tOE0sBU/C5/yF6qFg.9pJyuXpI0sG."; ## SECRET-DATA
+    }
+    login {
+        user lab {
+            uid 2001;
+            class super-user;
+            authentication {
+                encrypted-password "$6$jXCdbEZh$Hk/tTggpOdUp2e5PDY5mPxXigtwtey1Q0v5HB3MYdEcupdyCY1DiNgTDehGAUnBWWZMxog/QV8VxiqreEX.gL/"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        netconf {
+            ssh;
+        }
+    }
+}
+chassis {
+    fpc 0 {
+        pic 0 {
+            tunnel-services;
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        unit 0 {
+            family inet {
+                filter {
+                    input ge000_to_dcrouter;
+                }
+                address 172.31.10.57/20;
+            }
+        }
+    }
+}
+firewall {
+    family inet {
+        filter ge000_to_dcrouter {
+            term t1 {
+                from {
+                    source-address {
+                        172.31.9.34/32;
+                    }
+                }
+                then {
+                    routing-instance vn1;
+                }
+            }
+            term t11 {
+                from {
+                    source-address {
+                        172.31.8.198/32;
+                    }
+                }
+                then {
+                    routing-instance vn2;
+                }
+            }
+            term t2 {
+                then accept;
+            }
+        }
+    }
+}
+routing-instances {
+    vn1 {
+        instance-type vrf;
+        vrf-target target:64512:1;
+        vrf-table-label;
+        routing-options {
+            static {
+                route 172.31.9.34/32 next-table inet.0;
+            }
+            auto-export {
+                family inet {
+                    unicast;
+                }
+            }
+        }
+    }
+    vn2 {
+        instance-type vrf;
+        vrf-target target:64512:2;
+        vrf-table-label;
+        routing-options {
+            static {
+                route 172.31.8.198/32 next-table inet.0;
+            }
+            auto-export {
+                family inet {
+                    unicast;
+                }
+            }
+        }
+    }
+}
