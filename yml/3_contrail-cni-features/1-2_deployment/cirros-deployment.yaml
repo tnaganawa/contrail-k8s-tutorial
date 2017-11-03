@@ -1,0 +1,21 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: cirros-deployment
+  labels:
+    app: cirros-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cirros-deployment
+  template:
+    metadata:
+      labels:
+        app: cirros-deployment
+    spec:
+      containers:
+      - name: cirros
+        image: cirros
+        ports:
+        - containerPort: 22

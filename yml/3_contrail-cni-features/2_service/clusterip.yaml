@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: cirros-clusterip
+spec:
+  selector:
+    app: cirros-deployment
+  ports:
+  - protocol: TCP
+    port: 22

@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: cirros-loadbalancer
+spec:
+  selector:
+    app: cirros-deployment
+  ports:
+  - protocol: TCP
+    port: 22
+  type: LoadBalancer
