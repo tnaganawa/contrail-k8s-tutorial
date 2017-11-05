@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cirros-web
+  labels:
+    name: cirros-web
+spec:
+  containers:
+  - name: cirros-web
+    image: cirros
+    ports:
+      - containerPort: 22

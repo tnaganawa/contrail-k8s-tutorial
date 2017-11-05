@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cirros-myns2
+  labels:
+    name: cirros-myns2
+spec:
+  containers:
+  - name: cirros-myns2
+    image: cirros
+    ports:
+      - containerPort: 22

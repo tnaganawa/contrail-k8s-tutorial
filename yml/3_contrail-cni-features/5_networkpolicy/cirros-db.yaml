@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cirros-db
+  labels:
+    name: cirros-db
+spec:
+  containers:
+  - name: cirros-db
+    image: cirros
+    ports:
+      - containerPort: 22
